@@ -13,12 +13,16 @@ import os
 
 from typing import Annotated
 
+from dotenv import dotenv_values
+
+config = dotenv_values(".env")
+
 router = APIRouter(
     prefix="/auth", tags=["Auth"], responses={404: {"message": "Not found"}}
 )
 
-callbackEndpoint = os.getenv("CALLBACK_ENDPOINT")
-jwtSecret = os.getenv("JWT_KEY")
+callbackEndpoint = config["CALLBACK_ENDPOINT"]
+jwtSecret = config["JWT_KEY"]
 
 flow = Flow.from_client_secrets_file(
     "./client_secrets.json",
