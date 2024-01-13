@@ -35,7 +35,7 @@ async def root():
     return {"message": "success"}
 
 
-@app.get("/solar-docs", response_class=HTMLResponse)
+@app.get("/scalar-docs", response_class=HTMLResponse)
 async def read_items():
     return """<!doctype html>
 <html>
