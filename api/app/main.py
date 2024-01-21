@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from routers import auth, user, file, book
+from routers import auth, user, file, book,  supportTicket
 
 from database.engine import Base, engine
 
@@ -24,11 +25,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(file.router)
 app.include_router(book.router)
-
+app.include_router(supportTicket.router)
 
 @app.get("/")
 async def root():
