@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from routers import auth, user, file, book,  supportTicket
+from routers import auth, user, file, book,  supportTicket, instance
 
 from database.engine import Base, engine
 
@@ -32,6 +32,7 @@ app.include_router(user.router)
 app.include_router(file.router)
 app.include_router(book.router)
 app.include_router(supportTicket.router)
+app.include_router(instance.router)
 
 @app.get("/")
 async def root():
