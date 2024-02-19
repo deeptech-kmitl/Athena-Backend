@@ -9,7 +9,11 @@ def get_session(db: Session, id: int):
 
 
 def create_session(db: Session, session: schemas.SessionCreate):
-    db_session = models.Session(user_id=session.user_id, user_agent=session.user_agent)
+    db_session = models.Session(
+        user_id=session.user_id,
+        user_agent=session.user_agent,
+        # csrf_token=session.csrf_token,
+    )
     db.add(db_session)
     db.commit()
     db.refresh(db_session)

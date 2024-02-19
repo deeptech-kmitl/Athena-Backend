@@ -28,6 +28,7 @@ class Session(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     is_revoke = Column(Boolean, default=False)
     user_agent = Column(String)
+    # csrf_token = Column(String)
 
     user = relationship("User", back_populates="sessions", lazy=False)
 
