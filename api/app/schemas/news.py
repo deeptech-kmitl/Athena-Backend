@@ -19,3 +19,14 @@ class NewsSave(BaseModel):
     connect: str
     popup: bool
     status: str
+
+
+class News(BaseModel):
+    id: int
+    title: str
+    connect: str
+    popup: bool
+    status: str
+
+    class Config:
+        orm_mode = True
