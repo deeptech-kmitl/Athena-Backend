@@ -4,6 +4,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from routers import auth, user, file, book,  supportTicket, instance
+from starlette.middleware.sessions import SessionMiddleware
+
 
 from database.engine import Base, engine
 
@@ -24,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SessionMiddleware, secret_key="SECRET_KEY")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
