@@ -15,7 +15,7 @@ class User(Base):
     # role = relationship("Role", back_populates="users")
 
     sessions = relationship("Session", back_populates="user", lazy=False)
-    # news = relationship("News", back_populates="author", lazy=False)
+    news = relationship("News", back_populates="author", lazy=False)
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
