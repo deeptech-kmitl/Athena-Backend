@@ -18,6 +18,9 @@ class SupportTicket(Base):
     push_email = Column(Boolean, default=False)
     mark_resolved = Column(Boolean, default=False)
 
+    open_by_id = Column(Integer, ForeignKey("users.id"))
+    open_by = relationship("User", back_populates="support_ticket_opens")
+
     assign_to_id = Column(Integer, ForeignKey("users.id"))
     assign_to = relationship("User", back_populates="support_ticket_assign_tos")
 
