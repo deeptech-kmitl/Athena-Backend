@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Header
+import base64
+import hashlib
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from fastapi.responses import RedirectResponse, Response
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -10,6 +12,7 @@ import jwt
 import schemas.user as schemas
 from middleware.auth import get_auth_user
 import os
+from uuid import uuid4
 
 from typing import Annotated
 
@@ -21,17 +24,20 @@ router = APIRouter(
     prefix="/auth", tags=["Auth"], responses={404: {"message": "Not found"}}
 )
 
-callbackEndpoint = config["CALLBACK_ENDPOINT"]
-jwtSecret = config["JWT_KEY"]
+CALLBACK_ENDPOINT = config["CALLBACK_ENDPOINT"]
+JWT_SECRET = config["JWT_KEY"]
+
+CLIENT_SECRETS_FILE = "client_secrets.json"
+SCOPES = [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+]
 
 flow = Flow.from_client_secrets_file(
-    "./client_secrets.json",
-    scopes=[
-        "openid",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/userinfo.profile",
-    ],
-    redirect_uri=callbackEndpoint + "/auth/login/google/callback",
+    CLIENT_SECRETS_FILE,
+    scopes=SCOPES,
+    redirect_uri=CALLBACK_ENDPOINT + "/auth/login/google/callback",
 )
 
 
@@ -45,22 +51,29 @@ def get_db():
 
 
 @router.get("/login/google")
-async def login():
-    auth_uri = flow.authorization_url()
-    return RedirectResponse(auth_uri[0])
+async def login(request: Request, back_to: str = ""):
+    url, state = flow.authorization_url(include_granted_scopes="true")
+    request.session["state"] = state
+    request.session["back_to"] = back_to
+    return RedirectResponse(url)
 
 
 @router.get("/login/google/callback")
 async def callback(
-    code: str,
+    request: Request,
+    state: str,
     db: Session = Depends(get_db),
     user_agent: Annotated[str | None, Header()] = "",
 ):
-    flow.fetch_token(code=code)
-    credentials = flow.credentials
+    authorization_response = str(request.url)
+
+    if not request.session.get("state") == state:
+        raise HTTPException(400, "State does not match!")
+
+    flow.fetch_token(authorization_response=authorization_response)
 
     # Optionally, view the email address of the authenticated user.
-    user_info_service = build("oauth2", "v2", credentials=credentials)
+    user_info_service = build("oauth2", "v2", credentials=flow.credentials)
     user_info = user_info_service.userinfo().get().execute()
 
     email = user_info["email"]
@@ -70,13 +83,25 @@ async def callback(
         user = userRepo.create_user(db, schemas.UserCreate(email=email))
 
     session = sessionRepo.create_session(
-        db, schemas.SessionCreate(user_id=user.id, user_agent=user_agent)
+        db,
+        schemas.SessionCreate(
+            user_id=user.id,
+            user_agent=user_agent,
+        ),
     )
 
-    encoded_jwt = jwt.encode({"i": session.id}, jwtSecret, algorithm="HS256")
+    encoded_jwt = jwt.encode({"i": session.id}, JWT_SECRET, algorithm="HS256")
 
     response = RedirectResponse("/user/profile")
-    response.set_cookie(key="sec", value=encoded_jwt)
+    back_to_b64_str = request.session.get("back_to")
+    if not back_to_b64_str == "":
+        try:
+            response = RedirectResponse(
+                base64.b64decode(back_to_b64_str).decode("ascii")
+            )
+        except:
+            print("An exception occurred bad base64 back to")
+    response.set_cookie(key="sec", value=encoded_jwt, httponly=True)
     return response
 
 

@@ -6,3 +6,6 @@ save-dep:
 
 install:
 	pip install -r requirements.txt -v
+
+kill-port-mac:
+	netstat -vanp tcp | grep 3000
