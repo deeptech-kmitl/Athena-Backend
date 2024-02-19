@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from routers import auth, user, file, book
+from routers import auth, user, file, book, news
 from starlette.middleware.sessions import SessionMiddleware
 
 from database.engine import Base, engine
@@ -17,6 +18,7 @@ origins = []
 
 Base.metadata.create_all(bind=engine)
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -30,6 +32,9 @@ app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(file.router)
 app.include_router(book.router)
+app.include_router(news.router)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
