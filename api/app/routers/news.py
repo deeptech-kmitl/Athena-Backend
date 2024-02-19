@@ -2,19 +2,24 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 from pydantic import BaseModel
-from typing import List
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from middleware.auth import get_auth_user, AuthDep
+from database.engine import SessionLocal
 from sqlalchemy import Column, Integer, String, Boolean
 
-DATABASE_URL = ""
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+import schemas.news as schemas
+import repository.news as repo
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/news",
+    tags=["News"],
+    responses={404: {"message": "Not found"}},
+    dependencies=[Depends(get_auth_user)],
+)
+
 
 # Dependency
 def get_db():
@@ -24,70 +29,78 @@ def get_db():
     finally:
         db.close()
 
-class News(Base):
-    __tablename__ = "news"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    content = Column(String)
-    popup = Column(Boolean)
-
-# class News(BaseModel):
-#     title: str
-#     content: str
-#     popup: bool
-
-# news_data = [
-#     {'id': 1, 'title': 'News 1', 'content': 'This news1.', 'popup': False},
-#     {'id': 2, 'title': 'News 2', 'content': 'This news2.', 'popup': True},
-# ]
-
-@router.get("/news/", response_model=List[News])
-async def read_news(db: Session = Depends(get_db)):
-    return db.query(News).all()
-
-@router.get("/newspopup/", response_model=News )
-async def read_newspopup(db: Session = Depends(get_db)):
-    newspopup = next((n for n in news_data if n['popup']), None)
-    if newspopup:
-        return newspopup
-    raise HTTPException(status_code=404)
-
-#admin
-@router.post("/news/admin/", response_model=News) #create
-async def create_news(news: News, db: Session = Depends(get_db)):
-    news_id = len(news_data) + 1
-    news_item = {'id': news_id, 'title': news.title, 'content': news.content}
-    news_data.append(news_item)
-    return news_item
-
-@router.get("/news/admin/{news_id}", response_model=News) #list
-async def read_news_item(news_id: int):
-    news_item = next((n for n in news_data if n['id'] == news_id), None)
-    if news_item:
-        return news_item
-    raise HTTPException(status_code=404)
-
-@router.put("/news/admin/{news_id}", response_model=News) #update news
-async def update_news(news_id: int, news: News):
-    for n in news_data:
-        if n['id'] == news_id:
-            n['title'] = news.title
-            n['content'] = news.content
-            return n
-    raise HTTPException(status_code=404)
+@router.get("", response_model=list[schemas.News])
+async def get_news(db: Session = Depends(get_db)):
+    return repo.get_publish_news_list(db)
 
 
-@router.delete("/news/admin/{news_id}", response_model=News) #delete
-async def delete_news(news_id: int, db: Session = Depends(get_db)):
-    dbnews = db.query(News).filter(News.id == news_id).first()
-    if dbnews:
-        db.delete(dbnews)
-        db.commit()
-        return dbnews
+@router.get("/popup", response_model=list[schemas.News])
+async def get_popup_news(db: Session = Depends(get_db)):
+    return repo.get_popup_publish_news_list(db)
 
-@router.post("/news/upnews/admin/{news_id}", response_model=News) #upload img tham mai pen
-async def upload_image(news_id: int, file: UploadFile = File(...)):
-    upnews = await file.read()
-    return  upnews #name file or link
 
+# admin
+@router.get("/admin", response_model=list[schemas.News])
+async def admin_get_news(db: Session = Depends(get_db)):
+    return repo.get_news_list(db)
+
+
+@router.put("/admin", response_model=schemas.News)
+async def admin_create_news(
+    news_create: schemas.NewsCreate,
+    auth: AuthDep,
+    db: Session = Depends(get_db),
+):
+    news_create.author_id = auth.user.id
+    if news_create.status != "publish":
+        news_create.status = "draft"
+    news = repo.create(db, news_create)
+    if news:
+        return news
+    raise HTTPException(404)
+
+
+@router.get("/admin/{id}", response_model=schemas.News)  # list
+async def admin_get_news_by_id(id: int, db: Session = Depends(get_db)):
+    news = repo.get_news(db, id)
+    if news:
+        return news
+    raise HTTPException(404)
+
+
+@router.patch("/admin/{id}", response_model=schemas.News)
+async def admin_update_news(
+    id: int, news_save: schemas.NewsSave, db: Session = Depends(get_db)
+):
+    news = repo.get_news(db, id)
+    if news:
+        news_save.id = id
+        return repo.save(db, news_save)
+    raise HTTPException(404)
+
+
+@router.post("/admin/{id}/publish", response_model=schemas.News)
+async def admin_publish_news(id: int, db: Session = Depends(get_db)):
+    news = repo.get_news(db, id)
+    if news:
+        return repo.publish(db, id)
+    raise HTTPException(404)
+
+
+@router.post("/admin/{id}/unpublish", response_model=schemas.News)
+async def admin_unpublish_news(id: int, db: Session = Depends(get_db)):
+    news = repo.get_news(db, id)
+    if news:
+        return repo.unpublish(db, id)
+    raise HTTPException(404)
+
+
+@router.get("/{id}", response_model=schemas.News)
+async def get_news_by_id(id: int, db: Session = Depends(get_db)):
+    news = repo.get_news(db, id)
+    if news:
+        if news != "publish":
+            raise HTTPException(403, "No permission to read this news not publish")
+        return news
+    raise HTTPException(404)
