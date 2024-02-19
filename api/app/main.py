@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from routers import auth, user, file, book, news
+from starlette.middleware.sessions import SessionMiddleware
 
 from database.engine import Base, engine
 
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SessionMiddleware, secret_key="SECRET_KEY")
 
 app.include_router(auth.router)
 app.include_router(user.router)
