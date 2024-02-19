@@ -34,10 +34,9 @@ class SuppportTicketEvent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    message_type = Column(String)
-    message = Column(String)
+    event_type = Column(String)
 
-    file_type = Column(String)
+    message = Column(String)
     file = Column(String)
 
     read = Column(Boolean, default=False)
