@@ -41,7 +41,6 @@ class SessionBase(BaseModel):
 class SessionCreate(SessionBase):
     user_id: int
     user_agent: str
-    # csrf_token: str
 
 
 class SessionSave(SessionBase):
