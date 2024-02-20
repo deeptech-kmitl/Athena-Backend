@@ -14,8 +14,11 @@ class User(Base):
 
     # role = relationship("Role", back_populates="users")
 
-    sessions = relationship("Session", back_populates="user", lazy=False)
-    news = relationship("News", back_populates="author", lazy=False)
+    sessions = relationship("Session", back_populates="user", lazy=True)
+    news = relationship("News", back_populates="author", lazy=True)
+    support_ticket_events = relationship(
+        "SuppportTicketEvent", back_populates="user", lazy=True
+    )
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
