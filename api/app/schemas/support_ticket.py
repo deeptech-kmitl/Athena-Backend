@@ -7,21 +7,22 @@ class SupportTicketBase(BaseModel):
 
 
 class SupportTicketCreate(SupportTicketBase):
-    user_id: int
+    open_by_id: int
     title: str
-    priority: str
+    message: str
+    priority: int
     status: str
     push_notification: bool
     push_email: bool
 
 
 class SupportTicketCreateEvent(SupportTicketBase):
-    event_type: str
-    message: str
-    file: str
-    reply: bool
+    event_type: str = "message"
+    message: str = ""
+    file: str = ""
     user_id: int
     support_ticket_id: int
+    reply: bool = False
 
 
 class SupportTicket(SupportTicketBase):
@@ -33,12 +34,6 @@ class SupportTicket(SupportTicketBase):
     push_notification: bool
     push_email: bool
     mark_resolved: bool
-
-    assign_to_id: int
-    assign_to: user.User
-
-    created: str
-    updated: str
 
     class Config:
         orm_mode = True
@@ -56,9 +51,6 @@ class SupportTicketEvent(SupportTicketEventBase):
 
     read: bool
     reply: bool
-
-    created: str
-    updated: str
 
     class Config:
         orm_mode = True
