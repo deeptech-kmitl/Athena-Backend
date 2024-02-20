@@ -16,12 +16,6 @@ class User(Base):
 
     sessions = relationship("Session", back_populates="user", lazy=True)
     news = relationship("News", back_populates="author", lazy=True)
-    support_ticket_opens = relationship(
-        "SupportTicket", back_populates="open_by", lazy=True
-    )
-    support_ticket_assign_tos = relationship(
-        "SupportTicket", back_populates="assign_to", lazy=True
-    )
     support_ticket_events = relationship(
         "SuppportTicketEvent", back_populates="user", lazy=True
     )

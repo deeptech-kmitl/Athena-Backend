@@ -11,18 +11,26 @@ class SupportTicket(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     title = Column(String, index=True)
-    priority = Column(Integer)
+    priority = Column(Integer, default=0)
 
     status = Column(String, default="open")
     push_notification = Column(Boolean, default=False)
     push_email = Column(Boolean, default=False)
     mark_resolved = Column(Boolean, default=False)
 
-    open_by_id = Column(Integer, ForeignKey("users.id"))
-    open_by = relationship("User", back_populates="support_ticket_opens")
+    open_by_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+        ),
+    )
+    open_by = relationship(
+        "User",
+        foreign_keys=[open_by_id],
+    )
 
-    assign_to_id = Column(Integer, ForeignKey("users.id"))
-    assign_to = relationship("User", back_populates="support_ticket_assign_tos")
+    assign_to_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    assign_to = relationship("User", foreign_keys=[assign_to_id])
 
     events = relationship(
         "SuppportTicketEvent", back_populates="support_ticket", lazy=True
@@ -37,10 +45,10 @@ class SuppportTicketEvent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    event_type = Column(String)
+    event_type = Column(String, default="message")
 
-    message = Column(String)
-    file = Column(String)
+    message = Column(String, default="")
+    file = Column(String, default="")
 
     read = Column(Boolean, default=False)
     reply = Column(Boolean, default=False)
