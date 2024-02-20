@@ -5,7 +5,7 @@ import schemas.support_ticket as schemas
 
 
 def create(db: Session, ticket: schemas.SupportTicketCreate):
-    db_session = models.SupportTicket(**ticket.model_dump())
+    db_session = models.SupportTicket(**ticket.model_dump(exclude="message"))
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
@@ -13,7 +13,7 @@ def create(db: Session, ticket: schemas.SupportTicketCreate):
 
 
 def create_event(db: Session, event: schemas.SupportTicketCreateEvent):
-    db_session = models.SupportTicket(**event.model_dump())
+    db_session = models.SuppportTicketEvent(**event.model_dump())
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
@@ -35,7 +35,7 @@ def get_support_ticket_list_by_user(db: Session, user_id: int):
 def get_event_list_by_ticket(db: Session, ticket_id: int):
     return (
         db.query(models.SuppportTicketEvent)
-        .filter(models.SuppportTicketEvent.support_ticket == ticket_id)
+        .filter(models.SuppportTicketEvent.support_ticket_id == ticket_id)
         .all()
     )
 
