@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session, lazyload
 
 from models.sort import SortBy
@@ -10,12 +10,23 @@ import models.user as modelsUsr
 
 def get_credit_trasaction_list(
     db: Session,
+    user_id: int,
     filter: Optional[schemas.CreditTransactionFilter],
     limit: int = 10,
     page: int = 1,
 ):
     offset = (page - 1) * limit
-    query = select(models.CreditTransaction).limit(limit).offset(offset)
+    query = (
+        select(models.CreditTransaction)
+        .limit(limit)
+        .offset(offset)
+        .filter(
+            or_(
+                models.CreditTransaction.user_id == user_id,
+                models.CreditTransaction.target_id == user_id,
+            ),
+        )
+    )
     if filter is not None:
         query = filter.sort(query)
     result = db.execute(query)
