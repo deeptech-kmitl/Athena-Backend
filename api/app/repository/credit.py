@@ -39,7 +39,7 @@ def transfer_credit(
     detail: str,
     user_id: int,
     target_id: int,
-    amount: int,
+    amount: float,
 ):
     user = (
         db.query(modelsUsr.User)

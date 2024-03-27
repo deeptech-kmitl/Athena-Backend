@@ -5,11 +5,11 @@ import models.credit as models
 
 
 class CreditTransactionBase(BaseModel):
-    amount: int
+    amount: float
 
 
 class CreditTransactionCreate(CreditTransactionBase):
-    amount: int
+    amount: float
     email: str
 
 
