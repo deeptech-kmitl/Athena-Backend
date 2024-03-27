@@ -5,17 +5,14 @@ from sqlalchemy.sql import func
 from database.engine import Base
 
 
-class Image(Base):
-    __tablename__ = "images"
+class ImageType(Base):
+    __tablename__ = "image_types"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    description = Column(String)
     image_url = Column(String)
-    squashfs_location = Column(String)
 
-    type_id = Column(Integer, ForeignKey("image_types.id"))
-    type = relationship("ImageType", foreign_keys=[type_id])
+    images = relationship("Image", back_populates="type", lazy=False)
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())

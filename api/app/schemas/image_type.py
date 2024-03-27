@@ -2,30 +2,28 @@ from pydantic import BaseModel
 from . import user
 
 
-class ImageBase(BaseModel):
-    type_id: int
+class ImageTypeBase(BaseModel):
     name: str
     image_url: str
 
 
-class ImageCreate(ImageBase):
-    squashfs_location: str
+class ImageTypeCreate(ImageTypeBase):
+    pass
 
 
-class ImageSave(ImageCreate):
+class ImageTypeSave(ImageTypeCreate):
     id: int | None = None
 
 
-class Image(ImageBase):
+class ImageType(ImageTypeBase):
     id: int
 
     class Config:
         orm_mode = True
 
 
-class ImageAdmin(ImageBase):
+class ImageTypeAdmin(ImageTypeBase):
     id: int
-    squashfs_location: str
 
     class Config:
         orm_mode = True
