@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from routers import auth, user, file, news, instance, support_ticket
+from routers import auth, user, file, news, instance, support_ticket, credit
 from starlette.middleware.sessions import SessionMiddleware
 
 from database.engine import Base, engine
@@ -36,6 +36,7 @@ app.include_router(file.router)
 app.include_router(news.router)
 app.include_router(support_ticket.router)
 app.include_router(instance.router)
+app.include_router(credit.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

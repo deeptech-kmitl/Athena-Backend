@@ -10,6 +10,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
+    credit = Column(Integer, default=0)
     # role_id = Column(Integer, ForeignKey("roles.id"))
 
     # role = relationship("Role", back_populates="users")
@@ -19,7 +20,6 @@ class User(Base):
     support_ticket_events = relationship(
         "SuppportTicketEvent", back_populates="user", lazy=True
     )
-    instances = relationship("Instance", back_populates="owner", lazy=True)
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
