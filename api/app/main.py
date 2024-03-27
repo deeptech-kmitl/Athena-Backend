@@ -13,6 +13,7 @@ from routers import (
     credit,
     image,
     image_type,
+    package,
 )
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -49,6 +50,7 @@ app.include_router(instance.router)
 app.include_router(credit.router)
 app.include_router(image.router)
 app.include_router(image_type.router)
+app.include_router(package.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

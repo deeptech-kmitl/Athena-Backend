@@ -10,11 +10,14 @@ class Package(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
+    image_url = Column(String)
+    gres = Column(String)
 
     cpu = Column(Integer)
     gpu = Column(Integer)
     memory = Column(Integer)
     storage = Column(Integer)
+    price = Column(Integer)
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
