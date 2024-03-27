@@ -6,8 +6,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-origins = [
-]
+origins = []
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,34 +16,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-resources = {
-    "dgx01": {
-        "gpu": {
-            "1g.10gb": 4,
-            "7g.80gb": 3,
-        },
-        "cpu": 256,
-        "memory": 2048
-    }
-}
 
 @app.get("/")
 async def root():
     return {"message": "success"}
 
+
 class AllocateBody(BaseModel):
     gpuSpec: str
     gpuInstance: int
 
-@app.post("/allocate")
-async def allocate():
+
+@app.get("/allocate")
+async def allocate(port: str, token: str, path: str, gpu: str, name: str):
     id = uuid.uuid4()
-    cmds = ['./job.sh']
-     
+    cmds = ["./job.sh " + port + " " + token + " " + path + " " + gpu + " " + name]
+
+    print(cmds)
+
     result = subprocess.run(cmds, stdout=subprocess.PIPE, shell=True)
 
-    return {
-        "message": "success",
-        "id": id,
-        "stdout": result.stdout
-    }
+    return {"message": "success", "id": id, "stdout": result.stdout}
