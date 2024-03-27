@@ -41,6 +41,7 @@ async def get_credit(auth: AuthDep):
 
 @router.get("/transaction", response_model=list[schemas.CreditTransaction])
 async def get_credit_transaction(
+    auth: AuthDep,
     user_filter: schemas.CreditTransactionFilter = FilterDepends(
         schemas.CreditTransactionFilter,
     ),
@@ -48,7 +49,7 @@ async def get_credit_transaction(
     limit: int = Query(10, ge=1, le=50),
     page: int = Query(1, ge=1),
 ):
-    return repo.get_credit_trasaction_list(db, user_filter, limit, page)
+    return repo.get_credit_trasaction_list(db, auth.user.id, user_filter, limit, page)
 
 
 @router.post("/transfer", response_model=schemas.CreditTransaction)
