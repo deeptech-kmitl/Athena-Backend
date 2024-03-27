@@ -15,7 +15,7 @@ class NewsCreate(NewsBase):
 
 
 class NewsSave(BaseModel):
-    id: int
+    id: int | None = None
     title: str
     content: str
     popup: bool
