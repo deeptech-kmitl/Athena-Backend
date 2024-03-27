@@ -1,5 +1,7 @@
+from typing import List, Optional
+from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel
-from . import user
+import models.credit as models
 
 
 class CreditTransactionBase(BaseModel):
@@ -7,9 +9,8 @@ class CreditTransactionBase(BaseModel):
 
 
 class CreditTransactionCreate(CreditTransactionBase):
-    detail: str
-    user_id: int
-    target_id: int
+    amount: int
+    email: str
 
 
 class CreditTransactionSave(CreditTransactionBase):
@@ -30,3 +31,10 @@ class CreditTransactionAdmin(CreditTransactionBase):
 
     class Config:
         orm_mode = True
+
+
+class CreditTransactionFilter(Filter):
+    order_by: List[str] = ["amount"]
+
+    class Constants(Filter.Constants):
+        model = models.CreditTransaction
