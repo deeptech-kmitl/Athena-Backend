@@ -18,9 +18,5 @@ class SlurmerCluster(Base):
     start_port = Column(Integer)
     end_port = Column(Integer)
 
-    limit = Column(Integer)
-    limit_cpu = Column(Integer)
-    limit_gpu = Column(Integer)
-
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
