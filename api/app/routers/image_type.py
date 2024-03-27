@@ -15,7 +15,7 @@ import repository.image_type as repo
 
 router = APIRouter(
     prefix="/image-types",
-    tags=["ImageType Types"],
+    tags=["Image Types"],
     responses={404: {"message": "Not found"}},
     dependencies=[Depends(get_auth_user)],
 )
