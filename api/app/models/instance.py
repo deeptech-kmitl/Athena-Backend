@@ -9,10 +9,12 @@ class Instance(Base):
     __tablename__ = "instances"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    assign_to = Column(String, index=True)
+    name = Column(String)
+    assign_to = Column(String, nullable=True)
+    status = Column(String)
 
-    tunnel_instance_id = Column(String, index=True)
+    tunnel_id = Column(String)
+    token = Column(String)
     port = Column(Integer)
     map_to_port = Column(Integer)
 
