@@ -4,12 +4,18 @@ import models.instance as models
 import schemas.instance as schemas
 
 
-def get_instance(db: Session, id: int):
-    return db.query(models.Instance).filter(models.Instance.id == id).first()
+def get_instance(db: Session, id: int, user_id: int = None):
+    query = db.query(models.Instance).filter(models.Instance.id == id)
+    if user_id is not None:
+        query = query.filter(models.Instance.owner_id == user_id)
+    return query.first()
 
 
-def get_instance_list(db: Session):
-    return db.query(models.Instance).all()
+def get_instance_list(db: Session, user_id: int = None):
+    query = db.query(models.Instance)
+    if user_id is not None:
+        query = query.filter(models.Instance.owner_id == user_id)
+    return query.all()
 
 
 def create(
