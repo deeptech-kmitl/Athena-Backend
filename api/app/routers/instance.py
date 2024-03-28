@@ -48,14 +48,6 @@ async def get_instance(db: Session = Depends(get_db)):
     return repo.get_instance_list(db)
 
 
-@router.get("/{id}", response_model=schemas.Instance)  # list
-async def admin_get_instance_by_id(id: int, db: Session = Depends(get_db)):
-    instance = repo.get_instance(db, id)
-    if instance:
-        return instance
-    raise HTTPException(404, "instance not found")
-
-
 @router.post("/rent", response_model=schemas.Instance)
 async def admin_create_instance(
     create: schemas.InstanceCreate,
@@ -95,9 +87,17 @@ async def admin_get_instance(db: Session = Depends(get_db)):
     return repo.get_instance_list(db)
 
 
-@router.get("/admin/{id}", response_model=schemas.Instance)  # list
+@router.get("/admin/{id}", response_model=schemas.InstanceAdmin)  # list
 async def admin_get_instance_by_id(id: int, db: Session = Depends(get_db)):
     instance = repo.get_instance(db, id)
     if instance:
         return instance
     raise HTTPException(404, "instance not found")
+
+
+@router.get("/{id}", response_model=schemas.Instance)
+async def get_instance_by_id(id: int, db: Session = Depends(get_db)):
+    instance = repo.get_instance(db, id)
+    if instance:
+        return instance
+    raise HTTPException(404)
