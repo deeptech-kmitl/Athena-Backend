@@ -23,6 +23,8 @@ def create(db: Session, slurmer_cluster: schemas.SlurmerClusterCreate):
         user=slurmer_cluster.user,
         start_port=slurmer_cluster.start_port,
         end_port=slurmer_cluster.end_port,
+        server_proxy=slurmer_cluster.server_proxy,
+        endpoint_server=slurmer_cluster.endpoint_server,
     )
     db.add(db_session)
     db.commit()
@@ -44,6 +46,8 @@ def save(db: Session, save: schemas.SlurmerClusterSave):
         slurmer_cluster.user = save.user
         slurmer_cluster.start_port = save.start_port
         slurmer_cluster.end_port = save.end_port
+        slurmer_cluster.server_proxy = save.server_proxy
+        slurmer_cluster.endpoint_server = save.endpoint_server
         db.commit()
         db.refresh(slurmer_cluster)
     return slurmer_cluster

@@ -16,6 +16,8 @@ class SlurmerCluster(Base):
     token = Column(String)
     user = Column(String)
     app_id = Column(String)
+    server_proxy = Column(String)
+    endpoint_server = Column(String)
 
     start_port = Column(Integer)
     end_port = Column(Integer)

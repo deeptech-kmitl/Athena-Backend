@@ -9,6 +9,8 @@ class SlurmerClusterBase(BaseModel):
     start_port: int
     end_port: int
     app_id: str
+    server_proxy: str
+    endpoint_server: str
 
 
 class SlurmerClusterCreate(SlurmerClusterBase):
