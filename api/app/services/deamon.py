@@ -2,13 +2,20 @@ import os
 import subprocess
 
 
-template = """[Service]
+template = """[Unit]
+Wants=network-online.target
+After=network-online.target
+[Service]
+Type=simple
 Environment = "P1=start" "P2=alias" "P3={id}"
 ExecStart=/usr/local/bin/mole $P1 $P2 $P3
 Restart=always
 RestartSec=10
 StandardOutput = file:/tmp/service-{id}.log
-User=root"""
+User=root
+[Install]
+WantedBy=multi-user.target
+"""
 
 
 def activate_service(id: str):
