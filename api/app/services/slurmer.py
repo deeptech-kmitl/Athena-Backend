@@ -1,32 +1,108 @@
 import requests
 import json
 
-url = ""
+from models.image import Image
+from models.instance import Instance
+from models.package import Package
+from models.slurmer_cluster import SlurmerCluster
 
-payload = json.dumps(
-    {
-        "cpus_per_task": 1,
-        "job_name": "hello-tigerza",
-        "command": "--container-image=/dataset/squashfs/nvidia+pytorch+23.01-py3.sqsh",
-        "args": [
-            "--no-container-mount-home",
-            "--container-workdir=/root",
-            "--container-remap-root",
-            "--container-name=hello-tigerza",
-            "--no-container-mount-home",
-            "jupyter-lab",
-            "--LabApp.base_url=/tiger",
-            "--NotebookApp.token=bbbb",
-            "--port=8989",
-        ],
+
+def submit_job(
+    slurmer: SlurmerCluster, instance: Instance, image: Image, package: Package
+):
+    payload = json.dumps(
+        {
+            "cpus_per_task": 1,
+            "job_name": "athena-" + instance.tunnel_id,
+            "command": "--container-image=" + image.squashfs_location,
+            "args": [
+                "--no-container-mount-home",
+                "--container-workdir=/root",
+                "--container-remap-root",
+                "--container-name=" + instance.tunnel_id,
+                "--no-container-mount-home",
+                "jupyter-lab",
+                "--LabApp.base_url=/" + instance.tunnel_id,
+                "--NotebookApp.token=" + instance.token,
+                "--port=" + str(instance.port),
+            ],
+        }
+    )
+    headers = {
+        "X-Auth-Token": slurmer.token,
+        "user": slurmer.user,
+        "Content-Type": "application/json",
     }
-)
-headers = {
-    "X-Auth-Token": "",
-    "user": "",
-    "Content-Type": "application/json",
-}
 
-response = requests.request("POST", url, headers=headers, data=payload)
+    response = requests.request(
+        "POST",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs",
+        headers=headers,
+        data=payload,
+    )
 
-print(response.text)
+    return response.json()
+
+
+def get_job_status(slurmer: SlurmerCluster, instance: Instance):
+    headers = {
+        "X-Auth-Token": slurmer.token,
+        "user": slurmer.user,
+        "Content-Type": "application/json",
+    }
+
+    response = requests.request(
+        "GET",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id,
+        headers=headers,
+    )
+
+    return response.json()
+
+
+def start_job(slurmer: SlurmerCluster, instance: Instance):
+    headers = {
+        "X-Auth-Token": slurmer.token,
+        "user": slurmer.user,
+        "Content-Type": "application/json",
+    }
+
+    response = requests.request(
+        "PUT",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id + "/start",
+        headers=headers,
+    )
+
+    return response.json()
+
+
+def stop_job(slurmer: SlurmerCluster, instance: Instance):
+    headers = {
+        "X-Auth-Token": slurmer.token,
+        "user": slurmer.user,
+        "Content-Type": "application/json",
+    }
+
+    response = requests.request(
+        "PUT",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id + "/stop",
+        headers=headers,
+    )
+
+    return response.json()
+
+
+def delete_job(slurmer: SlurmerCluster, instance: Instance):
+    headers = {
+        "X-Auth-Token": slurmer.token,
+        "user": slurmer.user,
+        "Content-Type": "application/json",
+    }
+
+    response = requests.request(
+        "DELETE",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id,
+        headers=headers,
+    )
+
+    return response.json()
