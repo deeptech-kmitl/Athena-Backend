@@ -42,3 +42,31 @@ def create_route(name: str, path: str):
     )
 
     return response.json()
+
+
+def delete_service(name: str):
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    response = requests.request(
+        "DELETE",
+        KONG_API_URL + "/services/" + name,
+        headers=headers,
+    )
+
+    return response.json()
+
+
+def delete_route(name: str):
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    response = requests.request(
+        "DELETE",
+        KONG_API_URL + "/services/" + name + "/routes/" + name,
+        headers=headers,
+    )
+
+    return response.json()
