@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+
+from schemas.image import Image
 from . import user
 
 
@@ -17,6 +19,7 @@ class ImageTypeSave(ImageTypeCreate):
 
 class ImageType(ImageTypeBase):
     id: int
+    images: list[Image]
 
     class Config:
         orm_mode = True
@@ -24,6 +27,7 @@ class ImageType(ImageTypeBase):
 
 class ImageTypeAdmin(ImageTypeBase):
     id: int
+    images: list[Image]
 
     class Config:
         orm_mode = True
