@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from services.deamon import activate_service
 from services.kong import create_route, create_service
 from services.mole import create_alias, open_tunnel
 from services.slurmer import start_job, submit_job
@@ -98,7 +99,7 @@ async def admin_create_instance(
         path = "/lab/" + instance.tunnel_id
         create_service(instance.tunnel_id, instance.local_port, path)
         create_route(instance.tunnel_id, path)
-        open_tunnel(instance.tunnel_id)
+        activate_service(instance.tunnel_id)
         return instance
     raise HTTPException(404, "instance not found")
 
