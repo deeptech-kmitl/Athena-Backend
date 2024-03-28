@@ -14,7 +14,7 @@ import schemas.slurmer_cluster as schemas
 import repository.slurmer_cluster as repo
 
 router = APIRouter(
-    prefix="/slurmer_clusters",
+    prefix="/slurmer-clusters",
     tags=["SlurmerCluster"],
     responses={404: {"message": "Not found"}},
     dependencies=[Depends(get_auth_user)],
@@ -38,7 +38,7 @@ async def admin_get_slurmer_cluster(db: Session = Depends(get_db)):
 
 @router.put("/admin", response_model=schemas.SlurmerClusterCreate)
 async def admin_create_slurmer_cluster(
-    create: schemas.PackageCreate,
+    create: schemas.SlurmerClusterCreate,
     auth: AuthDep,
     db: Session = Depends(get_db),
 ):
