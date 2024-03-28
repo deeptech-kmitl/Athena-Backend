@@ -22,9 +22,9 @@ def submit_job(
                 "--container-name=" + instance.tunnel_id,
                 "--no-container-mount-home",
                 "jupyter-lab",
-                "--LabApp.base_url=/" + instance.tunnel_id,
+                "--LabApp.base_url=/lab/" + instance.tunnel_id,
                 "--NotebookApp.token=" + instance.token,
-                "--port=" + str(instance.port),
+                "--port=" + str(instance.remote_port),
             ],
         }
     )
@@ -67,13 +67,11 @@ def start_job(slurmer: SlurmerCluster, job_id: str):
         "Content-Type": "application/json",
     }
 
-    response = requests.request(
+    requests.request(
         "PUT",
         slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id + "/start",
         headers=headers,
     )
-
-    return response.json()
 
 
 def stop_job(slurmer: SlurmerCluster, job_id: str):
@@ -83,13 +81,11 @@ def stop_job(slurmer: SlurmerCluster, job_id: str):
         "Content-Type": "application/json",
     }
 
-    response = requests.request(
+    requests.request(
         "PUT",
         slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id + "/stop",
         headers=headers,
     )
-
-    return response.json()
 
 
 def delete_job(slurmer: SlurmerCluster, job_id: str):
@@ -99,10 +95,8 @@ def delete_job(slurmer: SlurmerCluster, job_id: str):
         "Content-Type": "application/json",
     }
 
-    response = requests.request(
+    requests.request(
         "DELETE",
         slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id,
         headers=headers,
     )
-
-    return response.json()

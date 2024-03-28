@@ -19,9 +19,8 @@ def create_alias(name: str, local_port: int, destination: str, server: str):
 
 
 def open_tunnel(name: str):
-    # mole start alias example --detach
     subprocess.Popen(
-        "mole start alias " + name + " --detach",
+        "mole start alias " + name + " -v --detach",
         shell=True,
     )
 
@@ -30,7 +29,7 @@ def close_tunnel(
     name: str,
 ):
     subprocess.Popen(
-        "mole stop alias " + name + " --detach",
+        "mole stop alias " + name + " -v --detach",
         shell=True,
     )
 
