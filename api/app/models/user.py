@@ -20,6 +20,7 @@ class User(Base):
     support_ticket_events = relationship(
         "SuppportTicketEvent", back_populates="user", lazy=True
     )
+    instances = relationship("Instance", back_populates="owner", lazy=True)
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
