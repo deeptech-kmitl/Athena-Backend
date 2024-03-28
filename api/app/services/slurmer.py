@@ -60,7 +60,7 @@ def get_job_status(slurmer: SlurmerCluster, instance: Instance):
     return response.json()
 
 
-def start_job(slurmer: SlurmerCluster, instance: Instance):
+def start_job(slurmer: SlurmerCluster, job_id: str):
     headers = {
         "X-Auth-Token": slurmer.token,
         "user": slurmer.user,
@@ -69,14 +69,14 @@ def start_job(slurmer: SlurmerCluster, instance: Instance):
 
     response = requests.request(
         "PUT",
-        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id + "/start",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id + "/start",
         headers=headers,
     )
 
     return response.json()
 
 
-def stop_job(slurmer: SlurmerCluster, instance: Instance):
+def stop_job(slurmer: SlurmerCluster, job_id: str):
     headers = {
         "X-Auth-Token": slurmer.token,
         "user": slurmer.user,
@@ -85,14 +85,14 @@ def stop_job(slurmer: SlurmerCluster, instance: Instance):
 
     response = requests.request(
         "PUT",
-        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id + "/stop",
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id + "/stop",
         headers=headers,
     )
 
     return response.json()
 
 
-def delete_job(slurmer: SlurmerCluster, instance: Instance):
+def delete_job(slurmer: SlurmerCluster, job_id: str):
     headers = {
         "X-Auth-Token": slurmer.token,
         "user": slurmer.user,
@@ -101,7 +101,7 @@ def delete_job(slurmer: SlurmerCluster, instance: Instance):
 
     response = requests.request(
         "DELETE",
-        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + instance.job_id,
+        slurmer.url + "/apps/" + slurmer.app_id + "/jobs/" + job_id,
         headers=headers,
     )
 
