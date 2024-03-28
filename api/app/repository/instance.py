@@ -18,8 +18,8 @@ def create(
     owner_id: int,
     tunnel_id: str,
     token: str,
-    port: int,
-    map_to_port: int,
+    local_port: int,
+    remote_port: int,
     slurmer_id: int,
 ):
     db_session = models.Instance(
@@ -30,8 +30,8 @@ def create(
         owner_id=owner_id,
         tunnel_id=tunnel_id,
         token=token,
-        port=port,
-        map_to_port=map_to_port,
+        local_port=local_port,
+        remote_port=remote_port,
         slurmer_id=slurmer_id,
         status="action",
     )
@@ -46,6 +46,15 @@ def save(db: Session, save: schemas.InstanceSave):
     if instance:
         instance.name = save.name
         instance.assign_to = save.assign_to
+        db.commit()
+        db.refresh(instance)
+    return instance
+
+
+def set_job(db: Session, id: int, job_id: str):
+    instance = db.query(models.Instance).filter(models.Instance.id == id).first()
+    if instance:
+        instance.job_id = job_id
         db.commit()
         db.refresh(instance)
     return instance

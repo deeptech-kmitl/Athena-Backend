@@ -10,6 +10,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from services.kong import create_route, create_service
+from services.mole import create_alias, open_tunnel
+from services.slurmer import start_job, submit_job
 from middleware.auth import get_auth_user, AuthDep
 from database.engine import SessionLocal
 from sqlalchemy import Column, Integer, String, Boolean
@@ -54,9 +57,11 @@ async def admin_create_instance(
     auth: AuthDep,
     db: Session = Depends(get_db),
 ):
-    if packageRepo.get_package(db, create.package_id) is None:
+    package = packageRepo.get_package(db, create.package_id)
+    if package is None:
         raise HTTPException(404, "package not found")
-    if imageRepo.get_image(db, create.image_id) is None:
+    image = imageRepo.get_image(db, create.image_id)
+    if image is None:
         raise HTTPException(404, "image not found")
 
     slurmer_list = slurmerClusterRepo.get_slurmer_cluster_list(db)
@@ -66,17 +71,34 @@ async def admin_create_instance(
 
     slurmer = slurmer_list[0]  # Select first
 
+    remote_port = slurmer.random_port()
+    local_port = random.randint(4000, 6000)
+
     instance = repo.create(
         db,
         create,
         owner_id=auth.user.id,
         tunnel_id=uuid.uuid4().hex,
         token=binascii.hexlify(os.urandom(40)).decode(),
-        port=slurmer.random_port(),
-        map_to_port=random.randint(4000, 6000),
+        local_port=local_port,
+        remote_port=remote_port,
         slurmer_id=slurmer.id,
     )
     if instance:
+        job = submit_job(slurmer, instance, image, package)
+        job_id = job["id"]
+        instance = repo.set_job(db, instance.id, job_id)
+        start_job(slurmer, job_id)
+        create_alias(
+            instance.tunnel_id,
+            local_port,
+            slurmer.endpoint_server + ":" + str(remote_port),
+            slurmer.server_proxy,
+        )
+        path = "/lab/" + instance.tunnel_id
+        create_service(instance.tunnel_id, instance.local_port, path)
+        create_route(instance.tunnel_id, path)
+        open_tunnel(instance.tunnel_id)
         return instance
     raise HTTPException(404, "instance not found")
 

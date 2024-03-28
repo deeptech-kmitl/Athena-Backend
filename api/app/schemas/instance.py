@@ -1,4 +1,10 @@
-from pydantic import BaseModel
+from typing import Optional
+from dotenv import dotenv_values
+from pydantic import BaseModel, validator
+
+config = dotenv_values(".env")
+
+LAB_DOMAIN = config["LAB_DOMAIN"]
 
 
 class InstanceBase(BaseModel):
@@ -21,6 +27,18 @@ class Instance(InstanceBase):
     tunnel_id: str
     token: str
     status: str
+    url: Optional[str] | None = None
+
+    @validator("url", pre=True, always=True)
+    def make_c(cls, v: str, values: dict):
+        return (
+            "https://"
+            + LAB_DOMAIN
+            + "/lab/"
+            + values["tunnel_id"]
+            + "?token="
+            + values["token"]
+        )
 
     class Config:
         from_attributes = True
@@ -33,8 +51,8 @@ class InstanceAdmin(InstanceBase):
 
     tunnel_id: str
     token: str
-    port: int
-    map_to_port: int
+    local_port: int
+    remote_port: int
 
     package_id: int
     image_id: int

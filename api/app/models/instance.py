@@ -12,11 +12,12 @@ class Instance(Base):
     name = Column(String)
     assign_to = Column(String, nullable=True)
     status = Column(String)
+    job_id = Column(String, default="")
 
     tunnel_id = Column(String)
     token = Column(String)
-    port = Column(Integer)
-    map_to_port = Column(Integer)
+    local_port = Column(Integer)
+    remote_port = Column(Integer)
 
     package_id = Column(Integer)
     image_id = Column(Integer)
