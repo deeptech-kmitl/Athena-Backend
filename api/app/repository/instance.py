@@ -33,6 +33,7 @@ def create(
         port=port,
         map_to_port=map_to_port,
         slurmer_id=slurmer_id,
+        status="action",
     )
     db.add(db_session)
     db.commit()
