@@ -36,7 +36,7 @@ class SupportTicket(SupportTicketBase):
     mark_resolved: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SupportTicketEventBase(BaseModel):
@@ -53,7 +53,7 @@ class SupportTicketEvent(SupportTicketEventBase):
     reply: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SupportTicketEventAdmin(SupportTicketEventBase):
@@ -61,4 +61,4 @@ class SupportTicketEventAdmin(SupportTicketEventBase):
     user: user.User
 
     class Config:
-        orm_mode = True
+        from_attributes = True

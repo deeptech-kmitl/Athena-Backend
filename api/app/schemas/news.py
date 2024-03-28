@@ -30,7 +30,7 @@ class News(BaseModel):
     status: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class NewsAdmin(BaseModel):
@@ -43,4 +43,4 @@ class NewsAdmin(BaseModel):
     author: user.User
 
     class Config:
-        orm_mode = True
+        from_attributes = True

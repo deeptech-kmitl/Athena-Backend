@@ -22,7 +22,7 @@ class CreditTransaction(CreditTransactionBase):
     detail: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreditTransactionAdmin(CreditTransactionBase):
@@ -30,7 +30,7 @@ class CreditTransactionAdmin(CreditTransactionBase):
     detail: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CreditTransactionFilter(Filter):

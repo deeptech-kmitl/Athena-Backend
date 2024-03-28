@@ -23,7 +23,7 @@ class Instance(InstanceBase):
     status: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class InstanceAdmin(InstanceBase):
@@ -43,4 +43,4 @@ class InstanceAdmin(InstanceBase):
     owner_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

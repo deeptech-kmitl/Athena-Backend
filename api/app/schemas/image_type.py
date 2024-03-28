@@ -22,7 +22,7 @@ class ImageType(ImageTypeBase):
     images: list[Image]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ImageTypeAdmin(ImageTypeBase):
@@ -30,4 +30,4 @@ class ImageTypeAdmin(ImageTypeBase):
     images: list[Image]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
