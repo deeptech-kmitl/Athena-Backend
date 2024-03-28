@@ -7,11 +7,11 @@ config = dotenv_values(".env")
 KONG_API_URL = config["KONG_API_URL"]
 
 
-def create_service(name: str, tunnel: str):
+def create_service(name: str, url: str):
     payload = json.dumps(
         {
             "name": name,
-            "url": tunnel,
+            "url": url,
         }
     )
     headers = {
