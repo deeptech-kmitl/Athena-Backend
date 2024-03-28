@@ -1,3 +1,4 @@
+import random
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -20,3 +21,6 @@ class SlurmerCluster(Base):
 
     created = Column(DateTime(timezone=True), server_default=func.now())
     updated = Column(DateTime(timezone=True), onupdate=func.now())
+
+    def random_port(self):
+        return random.randint(self.start_port, self.end_port)
