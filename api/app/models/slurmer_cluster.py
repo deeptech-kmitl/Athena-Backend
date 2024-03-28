@@ -7,7 +7,7 @@ from database.engine import Base
 
 
 class SlurmerCluster(Base):
-    __tablename__ = "slurmer-clusters"
+    __tablename__ = "slurmer_clusters"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
@@ -15,6 +15,7 @@ class SlurmerCluster(Base):
     url = Column(String)
     token = Column(String)
     user = Column(String)
+    app_id = Column(String)
 
     start_port = Column(Integer)
     end_port = Column(Integer)

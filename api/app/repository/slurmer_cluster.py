@@ -18,6 +18,7 @@ def create(db: Session, slurmer_cluster: schemas.SlurmerClusterCreate):
     db_session = models.SlurmerCluster(
         name=slurmer_cluster.name,
         url=slurmer_cluster.url,
+        app_id=slurmer_cluster.app_id,
         token=slurmer_cluster.token,
         user=slurmer_cluster.user,
         start_port=slurmer_cluster.start_port,
@@ -38,6 +39,7 @@ def save(db: Session, save: schemas.SlurmerClusterSave):
     if slurmer_cluster:
         slurmer_cluster.name = save.name
         slurmer_cluster.url = save.url
+        slurmer_cluster.app_id = save.app_id
         slurmer_cluster.token = save.token
         slurmer_cluster.user = save.user
         slurmer_cluster.start_port = save.start_port
